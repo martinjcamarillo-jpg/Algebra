@@ -287,6 +287,83 @@
     margin-top:8px;
   }
 
+  .interactive-box{
+    margin:24px 0 28px;
+    padding:22px;
+    background:rgba(255,255,255,.72);
+    border:1px solid var(--rule);
+    border-radius:12px;
+    box-shadow:0 10px 24px rgba(7,63,76,.07);
+  }
+  .interactive-box h3{margin-top:0;}
+  .control-row{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin:14px 0;
+  }
+  .control-row label{font-weight:600;}
+  .control-row input[type="range"]{accent-color:var(--teal);}
+  .control-row select{
+    max-width:100%;
+    padding:9px 12px;
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:white;
+    color:var(--ink);
+    font:inherit;
+  }
+  .pca-chart{
+    display:block;
+    width:100%;
+    max-width:520px;
+    height:auto;
+    margin:12px auto;
+    background:#f7faf8;
+    border:1px solid var(--rule);
+    border-radius:10px;
+  }
+  .pca-axis{stroke:var(--ochre);stroke-width:3;}
+  .pca-point{fill:var(--teal);stroke:white;stroke-width:2;}
+  .pca-grid{stroke:#d8e1de;stroke-width:1;}
+  .interactive-result{
+    padding:12px 14px;
+    border-left:4px solid var(--ochre);
+    background:var(--ochre-pale);
+    border-radius:0 8px 8px 0;
+  }
+  .codewords{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:12px 0;
+  }
+  .codewords span{
+    padding:5px 10px;
+    border:1px solid var(--rule);
+    border-radius:7px;
+    background:var(--paper);
+    font-family:'JetBrains Mono',monospace;
+  }
+  .source-link{
+    color:var(--teal-deep);
+    font-weight:600;
+  }
+  details.explanation{
+    margin:22px 0;
+    padding:16px 18px;
+    background:rgba(255,255,255,.68);
+    border:1px solid var(--rule);
+    border-radius:10px;
+  }
+  details.explanation summary{
+    cursor:pointer;
+    color:var(--teal-deep);
+    font-weight:600;
+  }
+  details.explanation[open] summary{margin-bottom:14px;}
+
   footer{
     margin-top:80px;
     padding-top:24px;
@@ -325,13 +402,15 @@
   <header class="masthead">
     <p class="kicker">APUNTES<span class="sep">·</span>ÁLGEBRA LINEAL AVANZADA</p>
     <h1 class="title">Álgebra Lineal Avanzada</h1>
-    <p class="subtitle">Fundamentos teóricos, construcciones algebraicas y representaciones para campos finitos, SVD y los subespacios fundamentales.</p>
+    <p class="subtitle">Fundamentos teóricos y construcciones algebraicas.</p>
   </header>
 
   <nav class="toc">
     <a href="#sec1"><span class="num">1</span>Teorema Fundamental del Álgebra Lineal</a>
     <a href="#sec2"><span class="num">2</span>Campos Finitos (Z<sub>p</sub>) y Características</a>
     <a href="#sec3"><span class="num">3</span>Descomposición en Valores Singulares (SVD)</a>
+    <a href="#sec4"><span class="num">4</span>Análisis de Componentes Principales (PCA)</a>
+    <a href="#sec5"><span class="num">5</span>Códigos lineales</a>
   </nav>
 
   <section id="sec1">
@@ -355,6 +434,33 @@
     <div class="ortho-box">
       $$C(A^T) \perp N(A) \ \text{ en } \mathbb{R}^n, \qquad C(A) \perp N(A^T) \ \text{ en } \mathbb{R}^m$$
     </div>
+
+    <h3 class="subhead">Dimensiones y consistencia de un sistema</h3>
+    <p>
+      Las dimensiones de cada par de subespacios complementarios suman la dimensión del espacio ambiente:
+    </p>
+    <div class="formula-block">
+      $$\dim C(A)+\dim N(A)=n,\qquad \dim C(A^T)+\dim N(A^T)=m.$$
+    </div>
+    <p>
+      El sistema $Ax=b$ tiene solución exactamente cuando $b\in C(A)$. Si $x_0$ es una solución,
+      todas las soluciones son $x=x_0+z$, donde $z\in N(A)$. Por eso el espacio nulo describe
+      todas las direcciones en las que una solución puede cambiar sin alterar el resultado.
+    </p>
+    <h3 class="subhead">Procedimiento para analizar una matriz de 2 × 3</h3>
+    <ol class="process">
+      <li>Reduce la matriz por filas hasta obtener una forma escalonada. Las operaciones elementales por filas conservan las soluciones del sistema homogéneo.</li>
+      <li>Cuenta las columnas con pivote: ese número es el rango $r$. Las columnas pivote de la matriz original forman una base para $C(A)$; las filas no nulas de la forma escalonada forman una base para el espacio de filas.</li>
+      <li>Resuelve $Ax=0$ usando la forma escalonada. Identifica las variables libres y escribe la solución como combinación lineal de vectores; estos vectores forman una base de $N(A)$.</li>
+      <li>Usa $N(A^T)=C(A)^\perp$: también puedes resolver $A^Ty=0$ para hallar una base del espacio nulo izquierdo.</li>
+      <li>Comprueba las dimensiones: $\dim C(A)=\dim C(A^T)=r$, $\dim N(A)=3-r$ y $\dim N(A^T)=2-r$.</li>
+    </ol>
+    <p class="note">
+      Al ser una matriz de 2 × 3, tiene dos filas y tres columnas: su rango no puede exceder 2.
+      Por tanto, el espacio nulo contiene al menos una dirección libre. Para un sistema $Ax=b$,
+      verifica además si $b$ pertenece al espacio columna; si existe una solución particular,
+      las demás se obtienen sumándole cualquier vector de $N(A)$.
+    </p>
   </section>
 
   <section id="sec2">
@@ -395,10 +501,13 @@
     <h3 class="subhead">2.1 Campos primos ℤ<sub>p</sub></h3>
     <p>
       Para cualquier número primo $p$, el conjunto $\mathbb{Z}_p = \{0, 1, \dots, p-1\}$ con la suma y
-      multiplicación módulo $p$ forma un campo finito.
+      multiplicación módulo $p$ forma un campo finito. Cada elemento distinto de cero tiene un inverso
+      multiplicativo; por ejemplo, en $\mathbb{Z}_5$, $2^{-1}=3$ porque $2\cdot3=6\equiv1\pmod 5$.
+      La primalidad importa: en $\mathbb{Z}_4$, el elemento 2 no tiene inverso, pues $2\cdot0=0$,
+      $2\cdot1=2$, $2\cdot2=0$ y $2\cdot3=2$ módulo 4. Por tanto, $\mathbb{Z}_4$ no es un campo.
     </p>
 
-    <h3 class="subhead">2.2 Campos de característica 2 y construcción de 𝔽₄</h3>
+    <h3 class="subhead">2.2 Característica y construcción de 𝔽₄</h3>
     <p>
       Los campos de característica 2 satisfacen $x + x = 0$ para todo elemento. El campo más pequeño es
       $\mathbb{F}_2 = \{0, 1\}$. Para construir extensiones como $\mathbb{F}_4$, se utiliza un polinomio
@@ -437,7 +546,11 @@
     </div>
     <p class="table-caption">Cuadro 2 — Tablas de adición y multiplicación en el campo finito 𝔽₄.</p>
 
-    <p class="note">Nota: en característica 2, la tabla de suma coincide con XOR sobre los coeficientes de cada elemento representado en la base $\{1, \alpha\}$.</p>
+    <p>
+      En general, los campos finitos tienen $p^k$ elementos, donde $p$ es primo y $k$ es un entero
+      positivo. Una extensión $\mathbb{F}_{p^k}$ puede construirse usando polinomios de grado menor
+      que $k$ y reduciendo sus productos módulo un polinomio irreducible de grado $k$.
+    </p>
   </section>
 
   <section id="sec3">
@@ -462,13 +575,169 @@
     <ol class="process">
       <li>Calcular $A^TA$ y obtener sus autovalores $\lambda_i$ y autovectores ortonormales $v_i$. Los valores singulares son $\sigma_i = \sqrt{\lambda_i}$.</li>
       <li>Construir la matriz $V = [v_1, v_2, \dots, v_n]$.</li>
-      <li>Obtener los vectores de $U$ mediante $u_i = \dfrac{1}{\sigma_i} A v_i$, para $i = 1, \dots, r$.</li>
+      <li>Para cada $\sigma_i>0$, obtener $u_i = \dfrac{1}{\sigma_i} A v_i$. Si se necesita la SVD completa, completar estos vectores hasta formar una base ortonormal de $\mathbb{R}^m$.</li>
     </ol>
+
+    <h3 class="subhead">Interpretación y aproximación de bajo rango</h3>
+    <p>
+      La matriz $V^T$ cambia las coordenadas de entrada, $\Sigma$ escala cada dirección y $U$
+      orienta el resultado en el espacio de salida. Las direcciones con valores singulares grandes
+      son las que más amplifica la transformación. Los valores singulares cero corresponden a
+      direcciones del espacio nulo.
+    </p>
+    <p>
+      Si se conservan solo los primeros $k$ valores singulares, se obtiene la mejor aproximación
+      de rango $k$ de $A$ en norma de Frobenius:
+    </p>
+    <div class="formula-block">
+      $$A_k=\sum_{i=1}^{k}\sigma_i u_i v_i^T,\qquad
+      \lVert A-A_k\rVert_F^2=\sum_{i=k+1}^{r}\sigma_i^2.$$
+    </div>
+    <p>
+      Esta propiedad explica usos como compresión de imágenes, reducción de ruido y análisis de
+      datos. Por ejemplo, para $A=\begin{bmatrix}3&0\\0&1\end{bmatrix}$, los valores singulares
+      son 3 y 1; conservar solo el primero da $A_1=\begin{bmatrix}3&0\\0&0\end{bmatrix}$ y
+      el error de Frobenius es 1.
+    </p>
+  </section>
+
+  <section id="sec4">
+    <h2><span class="secnum">4.</span>Análisis de Componentes Principales (PCA)</h2>
+    <div class="divider"></div>
+    <p>
+      El análisis de componentes principales (PCA, por sus siglas en inglés) transforma un conjunto
+      de variables posiblemente correlacionadas en nuevas coordenadas ortogonales. La primera
+      componente apunta en la dirección de máxima varianza; cada componente siguiente captura la
+      mayor varianza restante, bajo la condición de ser ortogonal a las anteriores.
+    </p>
+
+    <h3 class="subhead">Procedimiento matricial</h3>
+    <ol class="process">
+      <li>Organizar los datos en una matriz $X\in\mathbb{R}^{n\times p}$: filas para observaciones y columnas para variables.</li>
+      <li>Restar la media de cada columna para formar la matriz centrada $X_c$.</li>
+      <li>Si las variables tienen escalas o unidades distintas, estandarizarlas para que una escala numérica grande no domine el análisis.</li>
+      <li>Calcular la covarianza $S=\dfrac{1}{n-1}X_c^T X_c$ y sus pares propios $Sv_j=\lambda_jv_j$, ordenados de mayor a menor.</li>
+      <li>Proyectar los datos en los primeros $k$ ejes: $Z=X_cW_k$, donde $W_k=[v_1\ \cdots\ v_k]$.</li>
+    </ol>
+    <div class="formula-block">
+      $$\text{Proporción explicada por }v_j=
+      \frac{\lambda_j}{\sum_{i=1}^{p}\lambda_i}.$$
+    </div>
+    <p>
+      Los eigenvectores de $S$ son las direcciones principales porque la varianza de los datos
+      proyectados en un vector unitario $v$ es $v^TSv$. Maximizar esta expresión sujeto a
+      $\lVert v\rVert=1$ conduce a la ecuación $Sv=\lambda v$. PCA también puede calcularse
+      mediante la SVD de $X_c$: las columnas de $V$ son las direcciones principales y
+      $\lambda_i=\sigma_i^2/(n-1)$.
+    </p>
+
+    <div class="interactive-box">
+      <h3 class="subhead">Explora la dirección de proyección</h3>
+      <p>
+        La nube muestra cinco observaciones ya centradas. Mueve el control para girar la recta y
+        comparar la varianza que queda al proyectar los datos sobre ella. La primera componente
+        corresponde al ángulo que maximiza esa varianza.
+      </p>
+      <svg class="pca-chart" viewBox="0 0 320 240" role="img" aria-label="Nube de cinco puntos centrados y una recta de proyección ajustable">
+        <line class="pca-grid" x1="20" y1="120" x2="300" y2="120"></line>
+        <line class="pca-grid" x1="160" y1="20" x2="160" y2="220"></line>
+        <text x="290" y="112" fill="#52616d" font-size="12">x</text>
+        <text x="168" y="30" fill="#52616d" font-size="12">y</text>
+        <line class="pca-axis" id="pca-axis" x1="96.36" y1="56.36" x2="223.64" y2="183.64"></line>
+        <circle class="pca-point" cx="90" cy="190" r="6"></circle>
+        <circle class="pca-point" cx="125" cy="155" r="6"></circle>
+        <circle class="pca-point" cx="160" cy="85" r="6"></circle>
+        <circle class="pca-point" cx="195" cy="120" r="6"></circle>
+        <circle class="pca-point" cx="230" cy="50" r="6"></circle>
+      </svg>
+      <div class="control-row">
+        <label for="pca-angle">Ángulo de la recta:</label>
+        <input id="pca-angle" type="range" min="0" max="180" value="45" step="1">
+        <output id="pca-angle-value" for="pca-angle">45°</output>
+      </div>
+      <p class="interactive-result" id="pca-result" aria-live="polite">
+        Varianza proyectada: 4.75 de 5.00 (95.0%). La dirección de máxima varianza es 45°.
+      </p>
+      <p class="note">
+        En este ejemplo, $S=\begin{bmatrix}2.5&2.25\\2.25&2.5\end{bmatrix}$ tiene eigenvalores
+        4.75 y 0.25. Por tanto, la primera componente explica el 95% de la varianza total.
+      </p>
+    </div>
+    <p class="note">
+      PCA es una técnica descriptiva y lineal: puede facilitar visualización y compresión, pero
+      no demuestra causalidad. Conviene revisar la escala de las variables y recordar que valores
+      atípicos pueden cambiar las componentes.
+    </p>
+    <p class="note">
+      Lectura complementaria:
+      <a class="source-link" href="https://math.com.mx/pca.html" target="_blank" rel="noopener noreferrer">PCA: una introducción visual</a>.
+    </p>
+  </section>
+
+  <section id="sec5">
+    <h2><span class="secnum">5.</span>Códigos lineales</h2>
+    <div class="divider"></div>
+    <p>
+      Un código lineal binario de longitud $n$ y dimensión $k$ es un subespacio de
+      $\mathbb{F}_2^n$ de dimensión $k$. Cada palabra del código es una cadena de bits y la suma
+      se realiza componente a componente módulo 2 (XOR). Una matriz generadora $G$ permite formar
+      palabras de código como $c=wG$, con un mensaje $w\in\mathbb{F}_2^k$.
+    </p>
+    <p>
+      Un código también puede describirse mediante una matriz de comprobación de paridad $H$:
+      una palabra $c$ pertenece al código si $Hc^T=0$. Para un código $[3,2]$ con una sola
+      ecuación de paridad, $H=(h_1\ h_2\ h_3)$ es un vector binario no nulo y el código consta
+      de las cuatro soluciones de $h_1c_1+h_2c_2+h_3c_3=0$ en $\mathbb{F}_2$.
+    </p>
+    <p>
+      Hay exactamente siete de estos códigos: cada uno corresponde a uno de los siete vectores
+      no nulos de $\mathbb{F}_2^3$. En todos, $k=2$ y hay $2^2=4$ palabras. Selecciona una
+      ecuación para ver sus palabras, una matriz generadora y su distancia mínima.
+    </p>
+
+    <div class="interactive-box">
+      <h3 class="subhead">Explorador de los siete códigos [3,2]</h3>
+      <div class="control-row">
+        <label for="code-choice">Selecciona un código:</label>
+        <select id="code-choice">
+          <option value="001">Código 1: c₃ = 0</option>
+          <option value="010">Código 2: c₂ = 0</option>
+          <option value="011">Código 3: c₂ + c₃ = 0</option>
+          <option value="100">Código 4: c₁ = 0</option>
+          <option value="101">Código 5: c₁ + c₃ = 0</option>
+          <option value="110">Código 6: c₁ + c₂ = 0</option>
+          <option value="111">Código 7: c₁ + c₂ + c₃ = 0</option>
+        </select>
+      </div>
+      <p id="code-equation" class="interactive-result" aria-live="polite">Ecuación de paridad: c₃ = 0</p>
+      <p><strong>Palabras del código:</strong></p>
+      <div id="codewords" class="codewords" aria-live="polite">
+        <span>000</span><span>010</span><span>100</span><span>110</span>
+      </div>
+      <p>
+        <strong>Una matriz generadora:</strong> <span id="code-generator">G = [100; 010]</span>.
+        Sus filas son palabras independientes del código; sus combinaciones generan las cuatro palabras.
+      </p>
+      <p id="code-distance" class="interactive-result" aria-live="polite">
+        Distancia mínima d = 1. Detecta hasta 0 errores y corrige hasta 0 errores.
+      </p>
+      <p class="note">
+        La distancia de Hamming cuenta las posiciones distintas entre dos palabras. Un código
+        de distancia mínima $d$ detecta hasta $d-1$ errores y corrige hasta
+        $\left\lfloor\dfrac{d-1}{2}\right\rfloor$. Por ejemplo, el código de paridad par
+        $c_1+c_2+c_3=0$ tiene distancia 2: detecta un error, pero no puede corregirlo de forma
+        unívoca.
+      </p>
+    </div>
+    <p class="note">
+      Lectura complementaria:
+      <a class="source-link" href="https://math.com.mx/codigos_3_2.html#caso1" target="_blank" rel="noopener noreferrer">Los siete códigos [3,2]</a>.
+    </p>
   </section>
 
   <footer>
     <span>Álgebra Lineal Avanzada</span>
-    <span>Campos Finitos · SVD · Subespacios Fundamentales</span>
+    <span>Subespacios · Campos Finitos · SVD · PCA · Códigos lineales</span>
   </footer>
 
 </div>
@@ -482,6 +751,72 @@
       ],
       throwOnError: false
     });
+
+    const angleInput = document.getElementById("pca-angle");
+    const angleValue = document.getElementById("pca-angle-value");
+    const pcaAxis = document.getElementById("pca-axis");
+    const pcaResult = document.getElementById("pca-result");
+    const updatePca = function() {
+      const degrees = Number(angleInput.value);
+      const radians = degrees * Math.PI / 180;
+      const halfLength = 90;
+      const dx = halfLength * Math.cos(radians);
+      const dy = halfLength * Math.sin(radians);
+      const variance = 2.5 + 2.25 * Math.sin(2 * radians);
+      const percentage = variance / 5 * 100;
+      pcaAxis.setAttribute("x1", String(160 - dx));
+      pcaAxis.setAttribute("y1", String(120 + dy));
+      pcaAxis.setAttribute("x2", String(160 + dx));
+      pcaAxis.setAttribute("y2", String(120 - dy));
+      angleValue.value = degrees + "°";
+      pcaResult.textContent =
+        "Varianza proyectada: " + variance.toFixed(2) + " de 5.00 (" +
+        percentage.toFixed(1) + "%)." +
+        (degrees === 45 ? " Esta es la dirección de máxima varianza." : "");
+    };
+    angleInput.addEventListener("input", updatePca);
+    updatePca();
+
+    const codeChoice = document.getElementById("code-choice");
+    const codeEquation = document.getElementById("code-equation");
+    const codewordsOutput = document.getElementById("codewords");
+    const codeGenerator = document.getElementById("code-generator");
+    const codeDistance = document.getElementById("code-distance");
+    const bitNames = ["c₁", "c₂", "c₃"];
+    const updateCode = function() {
+      const parity = codeChoice.value.split("").map(Number);
+      const terms = parity
+        .map(function(bit, index) { return bit ? bitNames[index] : null; })
+        .filter(Boolean);
+      const codewords = [];
+      for (let value = 0; value < 8; value += 1) {
+        const word = value.toString(2).padStart(3, "0");
+        const parityValue = word.split("").reduce(function(sum, bit, index) {
+          return sum + Number(bit) * parity[index];
+        }, 0) % 2;
+        if (parityValue === 0) codewords.push(word);
+      }
+      const nonzeroWords = codewords.filter(function(word) { return word !== "000"; });
+      const generatorRows = nonzeroWords.slice(0, 2);
+      const minimumDistance = Math.min.apply(null, nonzeroWords.map(function(word) {
+        return word.split("").reduce(function(sum, bit) { return sum + Number(bit); }, 0);
+      }));
+      const equation = terms.join(" + ") + " = 0";
+      codeEquation.textContent = "Ecuación de paridad: " + equation + " en F₂.";
+      codewordsOutput.replaceChildren();
+      codewords.forEach(function(word) {
+        const item = document.createElement("span");
+        item.textContent = word;
+        codewordsOutput.appendChild(item);
+      });
+      codeGenerator.textContent = "G = [" + generatorRows.join("; ") + "]";
+      codeDistance.textContent =
+        "Distancia mínima d = " + minimumDistance + ". Detecta hasta " +
+        (minimumDistance - 1) + " errores y corrige hasta " +
+        Math.floor((minimumDistance - 1) / 2) + " errores.";
+    };
+    codeChoice.addEventListener("change", updateCode);
+    updateCode();
   });
 </script>
 
